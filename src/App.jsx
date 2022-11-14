@@ -16,14 +16,24 @@ function App() {
   const [dayClick, setDayClick] = useState(0);
   const [inputText, setInputText] = useState("");
   useEffect(() => {
-    getLocationByIp().then((res) => {
-      if (res) {
-        const { lat, lon } = res.data || {};
-        getForcastForSeaveDays(lat, lon).then((res) => {
-          setForcast(res?.data?.daily);
-        });
-      }
-    });
+    navigator.geolocation.getCurrentPosition(function success(position) {
+      // for when getting location is a success
+      getForcastForSeaveDays(
+        position.coords.latitude,
+        position.coords.longitude
+      ).then((res) => {
+        setForcast(res?.data?.daily);
+      });
+      return;
+    }),
+      getLocationByIp().then((res) => {
+        if (res) {
+          const { lat, lon } = res.data || {};
+          getForcastForSeaveDays(lat, lon).then((res) => {
+            setForcast(res?.data?.daily);
+          });
+        }
+      });
   }, []);
 
   const onClickSearch = () => {
